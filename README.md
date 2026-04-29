@@ -2,7 +2,7 @@
 
 Build desktop GUIs in C++ as easily as writing CLI programs.
 
-EzUI is a lightweight, declarative GUI library built on SDL2. It removes boilerplate, hides the event loop, and gives you a clean, intuitive API with reactive state.
+EzUI is a lightweight, declarative GUI library built on SDL2. It removes boilerplate, hides the event loop, and provides a clean API with reactive state.
 
 ---
 
@@ -37,39 +37,26 @@ No event loop. No rendering code. Just UI.
 
 ## ✨ Why EzUI?
 
-* **Declarative API** — Just call `Window()`, `Button()`, `Text()`
+* **Declarative API** — `Window()`, `Button()`, `Text()`, `Input()`
 * **Reactive State** — `State<T>` automatically updates UI
-* **No Boilerplate** — No event loops, no manual redraws
-* **Fast** — Dirty-flag rendering (no full redraw every frame)
+* **No Boilerplate** — No manual event loop or redraw logic
+* **Efficient Rendering** — Dirty-flag updates (no full redraw)
 * **Simple Layouts** — `VStack()` and `HStack()`
-* **CLI → GUI Bridge** — Turn terminal apps into GUIs quickly
+* **CLI → GUI Bridge** — Convert terminal-style apps into GUIs
 
 ---
 
 ## ⚡ Installation
 
-### Option 1: One-line install
-
-```bash
-curl -sSL https://raw.githubusercontent.com/ka1rav6/ezgui/main/install.sh | bash
-```
-
----
-
-### Option 2: Manual build
-
-#### Requirements
-
-* C++20 compiler (GCC 10+, Clang 12+)
-* SDL2
-* SDL2_ttf
-* CMake 3.16+
+### 1. Install dependencies
 
 ```bash
 sudo apt install libsdl2-dev libsdl2-ttf-dev cmake build-essential
 ```
 
-#### Build & Install
+---
+
+### 2. Build and install EzUI
 
 ```bash
 git clone https://github.com/ka1rav6/ezgui.git
@@ -82,20 +69,74 @@ cmake --build .
 sudo cmake --install .
 ```
 
----
+(Optional, if linker doesn’t detect it)
 
-## 🔧 Using EzUI in Your Project
-
-### CMake
-
-```cmake
-find_package(ezui REQUIRED)
-target_link_libraries(your_app ezui)
+```bash
+sudo ldconfig
 ```
 
 ---
 
-## 🧩 Core Concepts
+## 🧪 Using EzUI in Your Project
+
+### 📁 Project Structure
+
+```
+my_app/
+├── CMakeLists.txt
+└── main.cpp
+```
+
+---
+
+### 📄 main.cpp
+
+```cpp
+#include <ezui/ezui.h>
+using namespace EzUI;
+
+int main() {
+    App app;
+
+    app.build([&]() {
+        Window("Hello", 400, 300);
+        Text("EzUI is working!");
+    });
+
+    app.run();
+}
+```
+
+---
+
+### ⚙️ CMakeLists.txt (Recommended)
+
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(MyApp)
+
+set(CMAKE_CXX_STANDARD 20)
+
+find_package(ezui REQUIRED)
+
+add_executable(myapp main.cpp)
+target_link_libraries(myapp ezui::ezui)
+```
+
+---
+
+### 🔨 Build your app
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+./myapp
+```
+
+---
+
+## 🧩 Core API
 
 ### Window
 
@@ -103,15 +144,11 @@ target_link_libraries(your_app ezui)
 Window("Title", width, height, "#background_hex");
 ```
 
----
-
 ### Text
 
 ```cpp
 Text("Hello World");
 ```
-
----
 
 ### Button
 
@@ -121,7 +158,12 @@ Button("Click Me", []() {
 });
 ```
 
----
+### Input
+
+```cpp
+State<std::string> name("");
+Input("Enter name:", name);
+```
 
 ### Layouts
 
@@ -137,22 +179,20 @@ HStack(15, []() {
 });
 ```
 
----
-
 ### Reactive State
 
 ```cpp
 State<int> count(0);
 
-count = 10;           // triggers UI update
+count = 5;           // triggers UI update
 int value = count.get();
 ```
 
 ---
 
-## 🔥 CLI → GUI Bridge (Unique Feature)
+## 🔥 CLI → GUI Bridge
 
-Convert CLI-style logic into a GUI with minimal changes:
+Turn CLI-style logic into a GUI:
 
 ```cpp
 ConsoleCapture cli("App", 500, 400);
@@ -183,24 +223,13 @@ Component Tree
    ↓
 Renderer (SDL2)
    ↑
-Reactive State (dirty-flag updates)
+Reactive State (dirty updates)
 ```
 
 * Declarative frontend
 * Retained component tree
 * Observer-based state system
-* Partial redraw (efficient)
-
----
-
-## 📁 Project Structure
-
-```
-include/ezui/    # Public API
-src/             # Implementation
-examples/        # Sample apps
-install.sh       # One-line installer
-```
+* Partial redraw for performance
 
 ---
 
@@ -219,8 +248,19 @@ install.sh       # One-line installer
 
 * Developer tools
 * Internal apps
-* Prototypes
+* Rapid prototypes
 * CLI-to-GUI conversions
+
+---
+
+## 📁 Project Structure
+
+```
+include/ezui/    # Public API
+src/             # Implementation
+examples/        # Sample apps
+cmake/           # CMake config files
+```
 
 ---
 
@@ -228,14 +268,13 @@ install.sh       # One-line installer
 
 Early-stage project (v0.x)
 
-APIs may change as the library evolves.
+APIs may change.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome.
-Feel free to open issues or submit PRs.
+Contributions, issues, and suggestions are welcome.
 
 ---
 

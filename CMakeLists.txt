@@ -1,43 +1,72 @@
 cmake_minimum_required(VERSION 3.16)
-project(EzUI VERSION 0.1.0 LANGUAGES CXX)
+project(ezui VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# ── Find SDL2 ──────────────────────────────────────────────
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(SDL2 REQUIRED sdl2)
-pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+# Find dependencies
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
-# ── EzUI static library ───────────────────────────────────
-add_library(ezui STATIC
-    src/style.cpp
-    src/state.cpp
+# Library
+add_library(ezui
+    src/app.cpp
     src/components.cpp
     src/layout.cpp
-    src/app.cpp
+    src/state.cpp
+    src/style.cpp
     src/console_bridge.cpp
 )
 
-target_include_directories(ezui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${SDL2_INCLUDE_DIRS}
-    ${SDL2_TTF_INCLUDE_DIRS}
+target_include_directories(ezui
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(ezui PUBLIC
-    ${SDL2_LIBRARIES}
-    ${SDL2_TTF_LIBRARIES}
+target_link_libraries(ezui
+    PUBLIC SDL2::SDL2 SDL2_ttf::SDL2_ttf
 )
 
-target_compile_options(ezui PRIVATE -Wall -Wextra -Wpedantic)
+# ---------------- INSTALL ---------------- #
 
-# ── Example executables ───────────────────────────────────
-add_executable(hello_ezui   examples/hello/main.cpp)
-add_executable(counter_ezui examples/counter/main.cpp)
-add_executable(cli2gui_ezui examples/cli_to_gui/main.cpp)
+include(GNUInstallDirs)
 
-target_link_libraries(hello_ezui   PRIVATE ezui)
-target_link_libraries(counter_ezui PRIVATE ezui)
-target_link_libraries(cli2gui_ezui PRIVATE ezui)
+# Install library
+install(TARGETS ezui
+    EXPORT ezuiTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# Install headers
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Export targets (for find_package)
+install(EXPORT ezuiTargets
+    FILE ezuiTargets.cmake
+    NAMESPACE ezui::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ezui
+)
+
+# Create config file
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    ezuiConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+configure_file(
+    cmake/ezuiConfig.cmake.in
+    ezuiConfig.cmake
+    @ONLY
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/ezuiConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/ezuiConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ezui
+)
