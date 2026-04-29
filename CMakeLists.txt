@@ -4,11 +4,13 @@ project(ezui VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find dependencies
+# ---------------- Dependencies ---------------- #
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
-# Library
+# ---------------- Library ---------------- #
+
 add_library(ezui
     src/app.cpp
     src/components.cpp
@@ -25,14 +27,15 @@ target_include_directories(ezui
 )
 
 target_link_libraries(ezui
-    PUBLIC SDL2::SDL2 SDL2_ttf::SDL2_ttf
+    PUBLIC
+        SDL2::SDL2
+        SDL2_ttf::SDL2_ttf
 )
 
-# ---------------- INSTALL ---------------- #
+# ---------------- Install ---------------- #
 
 include(GNUInstallDirs)
 
-# Install library
 install(TARGETS ezui
     EXPORT ezuiTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -40,33 +43,35 @@ install(TARGETS ezui
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Install headers
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-# Export targets (for find_package)
+# ---------------- Export Targets ---------------- #
+
 install(EXPORT ezuiTargets
     FILE ezuiTargets.cmake
     NAMESPACE ezui::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ezui
 )
 
-# Create config file
+# ---------------- Config Files ---------------- #
+
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
-    ezuiConfigVersion.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/ezuiConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
 
+# 🔥 IMPORTANT: propagate dependencies
 configure_file(
     cmake/ezuiConfig.cmake.in
-    ezuiConfig.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/ezuiConfig.cmake"
     @ONLY
 )
 
 install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/ezuiConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/ezuiConfigVersion.cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/ezuiConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/ezuiConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ezui
 )
