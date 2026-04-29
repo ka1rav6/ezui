@@ -9,7 +9,7 @@ sudo apt update
 sudo apt install -y libsdl2-dev libsdl2-ttf-dev cmake g++
 
 # Clone repo
-git clone https://github.com/ka1rav6/ezgui.git
+git clone https://github.com/ka1rav6/ezui.git
 cd ezui
 
 # Build
